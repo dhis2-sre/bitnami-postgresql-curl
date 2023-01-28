@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  postgresql:
+    image: dhis2/postgresql-curl:${tag:-latest}
+    build:
+      context: .
+      args:
+        fromTag: ${fromTag:-latest}
