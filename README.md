@@ -1,10 +1,25 @@
-# 
+# Description
 
-Bitnami choose to remove curl from a lot of their images including postgresql... https://github.com/bitnami/containers/tree/main/bitnami/postgresql
+Bitnami have removed curl from their postgresql container as mentioned [here](https://github.com/bitnami/containers/issues/13637).
 
-We need curl...
+Since we're using curl to download data this project has been created.
 
 # Build and release
 
-Update .env with your desired values
-Commit and push... to master
+Please see the `Makefile` for details about how we're building.
+
+## Build latest
+
+The latest of the versions found in `versions.yaml` can be build and pushed using the following make command
+
+```sh
+make build-latest push-latest
+```
+
+## Build all versions
+
+All versions found in `versions.yaml` can be build and pushed using the following make command
+
+```sh
+make build-latest push-latest
+```
