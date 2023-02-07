@@ -22,4 +22,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build all images
-      run: make all
+      run: |
+        cat versions.yaml | yq
+        make all
