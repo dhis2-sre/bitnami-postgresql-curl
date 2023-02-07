@@ -1,4 +1,7 @@
 # Please keep the list sorted in descending order
 versions:
-  - 15.1.0
-  - 13.7.0
+  - 14
+  - 13
+  - 12
+  - 11
+  - 10
