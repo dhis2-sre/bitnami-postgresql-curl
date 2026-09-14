@@ -3,8 +3,10 @@ name: Makefile CI
 on:
   push:
     branches: [ "master" ]
+    paths: [Dockerfile, Makefile, versions.yaml, docker-compose.yml]
   pull_request:
     branches: [ "master" ]
+    paths: [Dockerfile, Makefile, versions.yaml, docker-compose.yml]
   schedule:
     - cron:  "0 0 * * *"
 jobs:
