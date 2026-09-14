@@ -27,6 +27,8 @@ jobs:
               pg_restore --version
               pg_isready --version
               curl --version
+              test -s /etc/ssl/certs/ca-certificates.crt
+              curl --fail --silent --show-error --head --max-time 30 https://www.postgresql.org/ >/dev/null
               gzip --version
               test "$(id -u)" != 0
             '
