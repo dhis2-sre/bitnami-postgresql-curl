@@ -9,12 +9,11 @@ chart also uses it for its separate seed job and wait container.
 
 The single Dockerfile pins the multiarchitecture manifest for
 `bitnamilegacy/postgresql:17`. `dhis2/postgresql-curl:17-legacy-r1` is built for
-Linux AMD64 and ARM64. The pinned base contains PostgreSQL 17.5. Existing numeric tags (`13` through `17`) are left untouched;
-the former numeric-tag version matrix is retired. Older deployments
-can retain their existing tags while version 3.0 adopts the new chart/image.
+Linux AMD64 and ARM64. The pinned base contains PostgreSQL 17.5. Existing numeric
+tags (`13` through `17`) are left untouched; the former version matrix is retired.
 
-Bitnami Legacy receives no upstream updates. This is a compatibility bridge;
-replacing Bitnami is a separate migration, not part of the test-performance work.
+Bitnami Legacy receives no upstream updates. This image preserves compatibility
+while a replacement base is evaluated.
 
 ## Build and test
 
@@ -43,11 +42,3 @@ to perform the same package refresh locally.
 For an intentional local release, `make all` tests first and then publishes;
 `make push-all` publishes without repeating tests. Registry credentials are required.
 The workflow never publishes the old numeric tags.
-
-The existing `.github/workflows/build.yml` workflow is currently disabled in GitHub.
-After this PR merges, re-enable it and dispatch it on master for the initial
-publication; its daily schedule then resumes. Keep it disabled until merge so
-the old master workflow cannot resume publishing numeric tags.
-
-Release order: merge/publish this image, release the chart that references
-`17-legacy-r1`, then update im-manager version 3.0 to that chart release.
