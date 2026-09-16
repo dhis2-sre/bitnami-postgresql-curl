@@ -1,10 +1,24 @@
-all: build-all push-all
+IMAGE ?= dhis2/postgresql-curl:17-legacy-r1
+PLATFORMS ?= linux/amd64,linux/arm64
 
+.PHONY: all build-all test push-all remove-all
+
+all: test
+	$(MAKE) push-all
+
+# Load the host architecture for local use. CI tests each platform separately.
 build-all:
-	yq -r '.versions | sort | .[]' versions.yaml | xargs -I '{}' sh -c 'fromTag="{}" tag="{}" docker compose build'
+	docker build --pull -t $(IMAGE) .
+
+test:
+	@set -eu; for platform in $$(echo $(PLATFORMS) | tr ',' ' '); do \
+		image="$(IMAGE)-test-$${platform##*/}"; \
+		docker buildx build --platform "$$platform" --load -t "$$image" .; \
+		./tests/restore.sh "$$image" "$$platform"; \
+	done
 
 push-all:
-	yq -r '.versions | sort | .[]' versions.yaml | xargs -I '{}' sh -c 'fromTag="{}" tag="{}" docker compose push'
+	docker buildx build --platform $(PLATFORMS) --push -t $(IMAGE) .
 
 remove-all:
-	yq -r '.versions | sort | .[]' versions.yaml | xargs -I '{}' sh -c 'docker rmi dhis2/postgresql-curl:{}'
+	docker rmi $(IMAGE)

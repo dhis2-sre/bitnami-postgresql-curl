@@ -1,32 +1,41 @@
-# Description
+# PostgreSQL with curl
 
-Bitnami have removed curl from their postgresql container as mentioned [here](https://github.com/bitnami/containers/issues/13637).
+This image adds curl and CA certificates to Bitnami PostgreSQL so database
+initialization scripts can download and restore dumps. It preserves the Bitnami
+entrypoint, environment variables and non-root UID 1001. The DHIS2 CloudNativePG
+chart also uses it for its separate seed job and wait container.
 
-Since we're using curl to download data this project has been created.
+## Current build
 
-# Build and release
+The single Dockerfile pins the multiarchitecture manifest for
+`bitnamilegacy/postgresql:17`. `dhis2/postgresql-curl:17-legacy-r1` is built for
+Linux AMD64 and ARM64. The pinned base contains PostgreSQL 17.5. Existing numeric tags (`13` through `17`) are left untouched;
+the former version matrix and daily publication are retired. Older deployments
+can retain their existing tags while version 3.0 adopts the new chart/image.
 
-Please see the `Makefile` for details about how we're building.
+Bitnami Legacy receives no upstream updates. This is a compatibility bridge;
+replacing Bitnami is a separate migration, not part of the test-performance work.
 
-## Build all versions
-
-All versions found in `versions.yaml` can be build and pushed using the following make command
-
-```sh
-make all
-```
-
-## CloudNativePG seed client
-
-`Dockerfile.seed` builds `dhis2/postgresql-curl:17-bookworm` for Linux AMD64 and ARM64
-from the official PostgreSQL 17 Debian image. It supplies bash, curl, trusted CA certificates, gzip, psql,
-pg_restore and pg_isready for the DHIS2 chart seed job and wait container, running
-as the postgres user. It is a client image, not a drop-in replacement for a
-Bitnami PostgreSQL server. Existing numeric tags retain their old build path.
-
-The seed workflow builds and smoke tests both architectures on pull requests;
-publication happens only from master after those checks pass.
+## Build and test
 
 ```sh
-docker build -f Dockerfile.seed -t dhis2/postgresql-curl:17-bookworm .
+make build-all                     # load the host architecture locally
+make test                          # build and validate AMD64 and ARM64
+make test PLATFORMS=linux/arm64     # validate one architecture
 ```
+
+Tests exercise the Bitnami server startup, HTTPS downloads, PostgreSQL tools,
+and custom-format and gzipped SQL restores from separate client containers.
+Each test removes its server container and anonymous volumes on exit. Cross-platform
+local runs require Docker emulation; CI installs QEMU before running both platforms.
+
+## Publish
+
+PRs only build and test. A push to master (or a manual workflow on master)
+publishes the multiarchitecture `17-legacy-r1` tag after both platform tests pass.
+For an intentional local release, `make all` tests first and then publishes;
+`make push-all` publishes without repeating tests. Registry credentials are required.
+The workflow never publishes the old numeric tags.
+
+Release order: merge/publish this image, release the chart that references
+`17-legacy-r1`, then update im-manager version 3.0 to that chart release.
