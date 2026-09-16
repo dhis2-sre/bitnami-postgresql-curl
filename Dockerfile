@@ -1,5 +1,4 @@
-ARG fromTag=latest
-FROM bitnami/postgresql:$fromTag
+FROM bitnamilegacy/postgresql:17@sha256:42a8200d35971f931b869ef5252d996e137c6beb4b8f1b6d2181dc7d1b6f62e0
 USER root
-RUN install_packages curl
+RUN install_packages curl ca-certificates
 USER 1001
